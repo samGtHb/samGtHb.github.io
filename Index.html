@@ -239,16 +239,5 @@
         </footer>
     </div>
 
-    <script>
-        function showPage(pageId) {
-            const pages = document.querySelectorAll('.page');
-            pages.forEach(page => {
-                page.classList.remove('active');
-            });
-            document.getElementById('IdPage_' + pageId ).classList.add('active');
-			document.getElementById('ObjSvgMainPage2').style.height = document.getElementById('DivSvgMainPage2').clientHeight;
-			document.getElementById('ObjSvgMainPage2').style.width = document.getElementById('DivSvgMainPage2').clientWidth;
-        }
-    </script>
 </body>
 </html>
