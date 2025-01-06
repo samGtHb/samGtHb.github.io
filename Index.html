@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page Multipage Plein Écran</title>
+    <style>
+	
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html, body {
+            height: 100%;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+		
+
+		
+        header, footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 1em;
+        }
+        main {
+            flex: 1;
+			width: 100%;
+			height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: #f4f4f4;
+        }
+		
+
+
+		.item {
+			flex: 1; /* Chaque élément prend une part égale de l'espace disponible */
+			display: flex;
+			box-sizing: border-box; /* Inclure la bordure dans la taille totale */
+			min-width: 100%; /* Assure que le texte ne dépasse pas le conteneur */
+			justify-content: center; /* Centre le texte horizontalement */
+			align-items: center; /* Centre le texte verticalement */
+			border: 1px solid #ccc; /* Bordure pour visualiser les éléments */
+			background-color: #f0f0f0; /* Couleur de fond des éléments */
+			font-size: 24px; /* Taille de la police */
+		}
+
+		.itemMain {
+			flex: 8; /* Chaque élément prend une part égale de l'espace disponible */
+		}
+
+        .page {
+            display: none;
+            width: 100%;
+            height: 100%;
+            justify-content: center;
+            align-items: center;
+        }
+		
+        .page.active {
+            display: flex;
+        }
+		
+        nav {
+            margin-top: 1em;
+        }
+        nav a {
+            margin: 0 1em;
+            text-decoration: none;
+            color: #fff;
+        }
+		
+		
+		
+		.ChildPage {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+			width: 100%;
+        }
+		
+		.SvgMain {
+            margin: 0;
+            padding: 0;
+			height : 100px;
+			width : 100px;
+        }
+		
+		
+		.btnPager {
+		  border: none;
+		  color: white;
+		  padding: 8px 8px;
+		  text-align: center;
+		  text-decoration: none;
+		  display: inline-block;
+		  font-size: 32px;
+		  font-weight:bold;
+		  margin: 0;
+		  transition-duration: 0.4s;
+		  cursor: pointer;
+		  background-color: #555555;
+		  border-radius: 8px;
+		}
+		
+		.btnPager:hover {	
+		
+			background-color: #f44336;
+			color: white;
+		}
+		
+    </style>
+		
+	<style type='text/css'>
+
+	.BOX0_000{stroke-width:0;stroke:none;fill:#27ae60}
+
+	.BOX1_000{stroke-width:0;stroke:none;fill:#909497}
+	.BOX1_001{stroke-width:0;stroke:none;fill:#f1c40f}
+	.BOX1_002{stroke-width:0;stroke:none;fill:#996633}
+	.BOX1_003{stroke-width:0;stroke:none;fill:#27ae60}
+	.BOX1_004{stroke-width:0;stroke:none;fill:#2980b9}
+	.BOX1_005{stroke-width:0;stroke:none;fill:#c0392b}
+	.BOX1_006{stroke-width:0;stroke:none;fill:#34495e}
+	.BOX1_007{stroke-width:0;stroke:none;fill:#2c3e50}
+	.BOX1_008{stroke-width:0;stroke:none;fill:#3498db}
+	.BOX1_009{stroke-width:0;stroke:none;fill:#1abc9c}
+	.BOX1_010{stroke-width:0;stroke:none;fill:#bdc3c7}
+
+	.REP_000{stroke-width:0;stroke:none;fill:#000}
+
+	.BOX2_000{stroke-width:1;stroke:#909497}
+	.BOX2_001{stroke-width:1;stroke:#f1c40f}
+	.BOX2_002{stroke-width:1;stroke:#f39c12}
+	.BOX2_003{stroke-width:1;stroke:#27ae60}
+	.BOX2_004{stroke-width:1;stroke:#2980b9}
+	.BOX2_005{stroke-width:1;stroke:#c0392b}
+	.BOX2_006{stroke-width:1;stroke:#34495e}
+	.BOX2_007{stroke-width:1;stroke:#2c3e50}
+	.BOX2_008{stroke-width:1;stroke:#3498db}
+	.BOX2_009{stroke-width:1;stroke:#1abc9c}
+
+	.WARN_000{fill:#fff}
+	.WARN_001{fill:##616a6b}
+	.WARN_002{fill:#e67e22}
+	.WARN_003{fill:#f00}
+
+	.CTEXT0_000{fill:#fff;font-weight:bold;font-size:32;text-anchor:start;dominant-baseline:Hanging;transform:translate(2px,10px)}
+	.CTEXT1_000{fill:#fff;font-weight:bold;font-size:38;text-anchor:middle;dominant-baseline:Hanging;transform:translate(16px,6px)}
+	.CTEXT2_000{fill:#fff;font-weight:bold;font-size:30;text-anchor:end;dominant-baseline:Hanging;transform:translate(-2px,4px)}
+	.CTEXT3_000{fill:#000;font-weight:bold;font-size:20;text-anchor:start;dominant-baseline:Hanging;transform:translate(0px,45px)}
+	.CTEXT4_000{fill:#000;font-weight:bold;font-size:20;text-anchor:start;dominant-baseline:Hanging;transform:translate(100px,45px)}
+
+	.CTEXT0_001{fill:#fff;font-weight:bold;font-size:32;text-anchor:start;dominant-baseline:Hanging;transform:translate(2px,10px)}
+	.CTEXT1_001{fill:#fff;font-weight:bold;font-size:38;text-anchor:middle;dominant-baseline:Hanging;transform:translate(16px,6px)}
+	.CTEXT2_001{fill:#fff;font-weight:bold;font-size:30;text-anchor:end;dominant-baseline:Hanging;transform:translate(-2px,4px)}
+	.CTEXT3_001{fill:#000;font-weight:bold;font-size:20;text-anchor:start;dominant-baseline:Hanging;transform:translate(0px,45px)}
+	.CTEXT4_001{fill:#000;font-weight:bold;font-size:20;text-anchor:start;dominant-baseline:Hanging;transform:translate(100px,45px)}
+
+	.CTEXT0_002{fill:#fff;font-weight:bold;font-size:24;text-anchor:start;dominant-baseline:Hanging;transform:translate(2px,10px)}
+	.CTEXT1_002{fill:#fff;font-weight:bold;font-size:26;text-anchor:middle;dominant-baseline:Hanging;transform:translate(12px,3px)}
+	.CTEXT2_002{fill:#fff;font-weight:bold;font-size:0;text-anchor:end;dominant-baseline:Hanging;transform:translate(-2px,4px)}
+	.CTEXT3_002{transform:translate(-3000px,0px)}
+	.CTEXT4_002{fill:#000;font-weight:bold;font-size:12;text-anchor:start;dominant-baseline:Hanging;transform:translate(100px,45px)}
+
+	.CTEXT0_003{fill:#fff;font-weight:bold;font-size:32;text-anchor:start;dominant-baseline:Hanging;transform:translate(2px,10px)}
+	.CTEXT1_003{fill:#fff;font-weight:bold;font-size:38;text-anchor:middle;dominant-baseline:Hanging;transform:translate(16px,6px)}
+	.CTEXT2_003{fill:#fff;font-weight:bold;font-size:30;text-anchor:end;dominant-baseline:Hanging;transform:translate(-2px,4px)}
+	.CTEXT3_003{fill:#000;font-weight:bold;font-size:20;text-anchor:start;dominant-baseline:Hanging;transform:translate(0px,45px)}
+	.CTEXT4_003{fill:#000;font-weight:bold;font-size:20;text-anchor:start;dominant-baseline:Hanging;transform:translate(100px,45px)}
+
+	.BPM_000{fill:#000;font-weight:bold;font-family:Impact;font-size:40;text-anchor:left;dominant-baseline:Hanging}
+	.NAME_000{fill:#000;font-weight:bold;font-family:Forte;font-size:40;text-anchor:left;dominant-baseline:Hanging}
+
+	.BPM_001{fill:#000;font-weight:bold;font-family:Impact;font-size:40;text-anchor:left;dominant-baseline:Hanging}
+	.NAME_001{fill:#000;font-weight:bold;font-family:Forte;font-size:40;text-anchor:left;dominant-baseline:Hanging}
+
+	.BPM_002{fill:#000;font-weight:bold;font-family:Impact;font-size:24;text-anchor:left;dominant-baseline:Hanging}
+	.NAME_002{fill:#000;font-weight:bold;font-family:Forte;font-size:24;text-anchor:left;dominant-baseline:Hanging;transform:translate(-30px,0px)}
+
+	.BPM_003{fill:#000;font-weight:bold;font-family:Impact;font-size:40;text-anchor:left;dominant-baseline:Hanging}
+	.NAME_003{fill:#000;font-weight:bold;font-family:Forte;font-size:40;text-anchor:left;dominant-baseline:Hanging}
+
+	.SVG_000{ }
+	.SVG_001{ }
+	.SVG_002{transform:translate(-3000px,0px) }
+	.SVG_003{transform:translate(-3000px,0px) }
+
+
+
+	.CTESSAI{fill:#fff;font-weight:bold;font-size:52px;text-anchor:start;dominant-baseline:Hanging;}
+	</style>
+
+
+
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Mon Site Web</h1>
+        </header>
+        <main>
+            <div id="IdPage_01" class="page active">
+
+            </div>
+            <div id="IdPage_02" class="page">
+                <div class="ChildPage">
+					<div class="item itemHead">Head</div>
+					<div class="item itemMain" id="DivSvgMainPage2">
+						<svg class="SvgMain" id="ObjSvgMainPage2" viewBox="0 0 100 50">
+							<rect class='BOX0_000' width='95' height='45' x='2' y='2' rx='5' ry='5'/>
+							<text class='CTESSAI' x='5' y='5' >C</text>
+						</svg>
+					</div>
+					<div class="item itemFoot">Foot</div>
+				</div>
+            </div>
+            <div id="IdPage_03" class="page">
+
+
+            </div>
+
+        </main>
+        <footer>
+             <nav>
+                <button class="btnPager"a href="#" onclick="showPage('01')">01</button>
+                <button class="btnPager"a href="#" onclick="showPage('02')">02</button>
+                <button class="btnPager"a href="#" onclick="showPage('03')">03</button>
+            </nav>
+        </footer>
+    </div>
+
+    <script>
+        function showPage(pageId) {
+            const pages = document.querySelectorAll('.page');
+            pages.forEach(page => {
+                page.classList.remove('active');
+            });
+            document.getElementById('IdPage_' + pageId ).classList.add('active');
+			document.getElementById('ObjSvgMainPage2').style.height = document.getElementById('DivSvgMainPage2').clientHeight;
+			document.getElementById('ObjSvgMainPage2').style.width = document.getElementById('DivSvgMainPage2').clientWidth;
+        }
+    </script>
+</body>
+</html>
