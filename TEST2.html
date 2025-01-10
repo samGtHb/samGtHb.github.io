@@ -1,0 +1,1901 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DIRTY MONKEYS V2</title>
+ 
+ 
+ <script>
+ 
+ let audioContext ;
+ let intervalId;
+ let intCountMes = 0;
+ let intCountBeat = 1;
+ let intCountDiv = 4;
+ let ArrayPart;
+ let strPageID = "??";
+ 
+ function showPage(pageId) {
+ InitNewPage(pageId);
+ strPageID = pageId;
+ document.getElementById('IdPage_' + pageId ).classList.add('active');
+ document.getElementById('HeadSongName').innerHTML = document.getElementById('InsSongNamePage_' + pageId).innerHTML;
+ document.getElementById('HeadSongBpm').innerHTML = document.getElementById('InsSongBpmPage_' + pageId).innerHTML;
+ document.getElementById('HeadSongStart').innerHTML = document.getElementById('InsSongSartPage_' + pageId).innerHTML;
+ document.getElementById('HeadCounterArray').innerHTML = document.getElementById('InsCounterArrayPage_' + pageId).innerHTML;
+ document.getElementById('bpm').value = parseInt(document.getElementById('InsSongBpmVALPage_' + pageId).innerHTML);
+ 
+ if	(pageId=="01")
+ {
+	var zoomCoeff = document.getElementById('IdPage_' + pageId ).clientWidth / 900.00;
+	document.getElementById('DivSvgIdPage_01').style.zoom =  zoomCoeff;
+ }
+ //852
+}
+
+
+function InitNewPage(pageId) {
+ const pages = document.querySelectorAll('.page');
+ pages.forEach(page => {
+ page.classList.remove('active');
+ });
+ 
+ const parts = document.querySelectorAll('.PartElement');
+ parts.forEach(part => {
+ part.classList.remove('active');
+ });
+
+ if (intervalId) 
+ {
+  clearInterval(intervalId);
+  intervalId = null;
+ }
+
+   ArrayPart = null
+   audioContext = null
+   InitMet();
+   
+   //document.getElementById('IdPage_01')
+
+}
+    
+ 
+ function SetPartSelect(NbCurrentMes , BooAdd)
+ {
+  if (NbCurrentMes > 0 && NbCurrentMes < ArrayPart.length )
+  {
+   SetActiveView('Song_' + strPageID + '_Part_' + ArrayPart[NbCurrentMes -1] , BooAdd);
+  }
+ }
+ 
+ function SetActiveView(strIDObj , BooAdd)
+ {
+  var ObjPart = document.getElementById(strIDObj);
+  
+  if (ObjPart != null)
+  {
+   if (BooAdd)
+    ObjPart.classList.add('active');
+   else
+    ObjPart.classList.remove('active');
+  }
+ }
+
+function playClick() {
+
+  var note = audioContext.createOscillator();
+  
+  SetActiveView('Click_0' + String(intCountBeat) , false);
+  if ( (intCountBeat % intCountDiv ) == 0)
+  {
+  
+ SetPartSelect(intCountMes , false);
+   intCountBeat = 1;
+   intCountMes ++; 
+   SetPartSelect(intCountMes , true);
+   note.frequency.value = 380;
+  }
+  else
+  {
+   intCountBeat ++;
+   note.frequency.value = 280;
+  }
+  
+  SetActiveView('Click_0' + String(intCountBeat) , true);
+  document.getElementById('HeadMesureCounter').innerHTML = String(intCountMes);
+ 
+  note.connect(audioContext.destination);
+
+  note.start();
+  note.stop(audioContext.currentTime + 0.05);
+ 
+        }
+
+function SetRun()
+ {
+  if (intervalId) 
+  {
+   clearInterval(intervalId);
+   intervalId = null;
+   document.getElementById('BtnRunMet').innerHTML = '&#9654;';
+   SetActiveView('BtnRunMet' , false);
+  }
+  else
+  {
+
+
+   let bpm = document.getElementById('bpm').value;
+   if (bpm==-1) 
+    return ;
+ 
+ document.getElementById('BtnRunMet').innerHTML = '&#x23F8;';
+ ArrayPart = document.getElementById('HeadCounterArray').innerHTML.split(';');
+ audioContext = new (window.AudioContext || window.webkitAudioContext)();
+ SetActiveView('BtnRunMet' , true) ;
+ let interval = 60000 / bpm; // Convert BPM to milliseconds
+ intervalId = setInterval(playClick, interval);
+  }
+ } 
+
+ function InitMet()
+ {
+ const parts = document.querySelectorAll('.PartElement');
+ parts.forEach(part => {
+ part.classList.remove('active');
+ });
+ 
+   intCountMes = 0;
+   intCountBeat = 1;
+   intCountDiv = 4;
+   intCountBeat = intCountDiv;
+ }
+ 
+ </script>
+
+
+
+<style>
+
+ * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+ }
+ html, body {
+  height: 100%;
+  font-family: Arial, sans-serif;
+ }
+ .container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+ }
+
+ ins , input{
+   display: none;
+  }
+
+ header, footer {
+  background-color: #333;
+  color: white;
+  text-align: center;
+  padding: 0;
+ }
+ main {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: #f4f4f4;
+ }
+
+
+
+.item {
+flex: 1; /* Chaque élément prend une part égale de l'espace disponible */
+display: flex;
+box-sizing: border-box; /* Inclure la bordure dans la taille totale */
+min-width: 100%; /* Assure que le texte ne dépasse pas le conteneur */
+justify-content: start; /* Centre le texte horizontalement */
+align-items: start; /* Centre le texte verticalement */
+border: 1px solid #ccc; /* Bordure pour visualiser les éléments */
+background-color: #f0f0f0; /* Couleur de fond des éléments */
+font-size: 24px; /* Taille de la police */
+}
+
+.itemMain {
+flex: 8; /* Chaque élément prend une part égale de l'espace disponible */
+}
+
+ .page {
+  display: none;
+  width: 100%;
+  height: 100%;
+  justify-content: center;
+  align-items: center;
+ }
+
+ .page.active {
+  display: flex;
+ }
+
+ nav {
+  margin: 0;
+ }
+ nav a {
+  text-decoration: none;
+  color: #fff;
+ }
+
+
+
+.ChildPage {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+width: 100%;
+ }
+
+.SvgMain {
+  margin: 0;
+  padding: 0;
+height : 100px;
+width : 100px;
+ }
+
+
+.btnPager {
+border: none;
+color: white;
+padding: 8px 8px;
+text-align: center;
+text-decoration: none;
+display: inline-block;
+font-size: 32px;
+font-weight:bold;
+margin: 0;
+transition-duration: 0.4s;
+cursor: pointer;
+background-color: #555555;
+border-radius: 8px;
+}
+
+.btnPager:hover { 
+
+background-color: #f44336;
+color: white;
+}
+
+</style>
+  
+ <style type='text/css'>
+
+ .TXT_START{fill:#000;font-weight:bold;font-size:30px;text-anchor:start;dominant-baseline:Hanging;}
+ .TXT_TYPE{fill:#fff;font-weight:bold;font-size:56px;text-anchor:start;dominant-baseline:Hanging;transform:translate(4px,4px)}
+ .TXT_NOTE{fill:#000;font-weight:bold;font-size:18px;text-anchor:start;dominant-baseline:text-bottom;}
+ .TXT_MES{fill:#fff;font-weight:bold;font-size:36px;text-anchor:end;dominant-baseline:Hanging;transform:translate(-4px,0px)}
+ .BOX_PART{fill:#fff;stroke-width:2;stroke:#909497}
+ .TXT_PART{fill:#000;font-weight:bold;font-size:60px;text-anchor:middle;dominant-baseline:central;}
+ .BOX_SNG{stroke-width:0;stroke:none;}
+ .BOX_SVG{background-color:#f00}
+ 
+ .flex-container {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+}
+
+.flex-container > div {
+  margin: 2px;
+  text-align: center;
+  line-height: 34px;
+  font-size: 30px;
+}
+
+ .flex-header {
+  display: flex;
+  width:100%;
+  flex-wrap: wrap;
+  flex-direction: row;
+
+}
+
+.flex-header > div {
+  margin: 10px;
+  text-align: center;
+  line-height: 60px;
+  font-size: 60px;
+  justify-content: space-between; /* Centre le texte horizontalement */
+  align-items: end; /* Centre le texte verticalement */
+}
+
+ .flex-menu {
+  display: flex;
+  width:100%;
+  flex-wrap: wrap;
+  flex-direction: row;
+
+}
+
+.flex-menu > div {
+  cursor: pointer;
+  margin: 2px;
+  padding: 0px;
+  width:100%;
+  background-color: #333;
+  color: #fff;
+  text-align: left;
+  border: thick double #111;
+  font-size: 20px;
+  justify-content: space-between; /* Centre le texte horizontalement */
+  align-items: end; /* Centre le texte verticalement */
+}
+
+ .box {
+  position:absolute;
+  background-color:#95a5a6;
+  z-index:10;
+  border-radius: 10px;
+  display: block;
+  width: 135px;
+  height: 65px;
+  overflow:hidden;
+  width 2s,
+  height 2s
+ }
+
+.box:hover {
+  width: 200px;
+  height: 200px;
+}
+
+.btnMetro {
+ position:absolute;
+ top:80px;
+    border: none;
+    color: white;
+ width: 40px;
+    padding: 2px 4px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 24px;
+    font-weight:bold;
+    margin: 0;
+    transition-duration: 0.4s;
+    cursor: pointer;
+    background-color: #555555;
+    border-radius: 8px;
+  }
+  
+  .btnMetro:hover { 
+   background-color: #f44336;
+   color: white;
+  }
+  
+  .btnMetro.active { 
+   background-color: #27ae60;
+  }
+  
+  
+    .ClickElement {
+            fill: grey;
+        }
+  
+        .ClickElement.active {
+            fill: #f44336;
+        }
+  
+  
+   .PartElement {
+            background-color: transparent;
+        }
+  
+    .PartElement.active {
+            background-color: #f44336;
+        }
+
+ </style>
+
+</head>
+<body onload="showPage('00')">
+    <div class="container">
+  <header>
+   <div class="flex-header">
+ <div class="box"> 
+  <svg width="105" height="30" style="position:absolute;top:0px;left:0px" xmlns="http://www.w3.org/2000/svg">
+  <!-- Corps du métronome -->
+  <!-- Compteur de beats -->
+  <circle id='Click_01' class='ClickElement' r="10" cx="15" cy="15" stroke="#fff" stroke-width="3" />
+  <circle id='Click_02' class='ClickElement' r="10" cx="40" cy="15" stroke="#fff" stroke-width="3" />
+  <circle id='Click_03' class='ClickElement' r="10" cx="65" cy="15" stroke="#fff" stroke-width="3" />
+  <circle id='Click_04' class='ClickElement' r="10" cx="90" cy="15" stroke="#fff" stroke-width="3" />
+  </svg>
+  <button id='BtnRunMet' class="btnMetro" style="left:2px;" onclick="SetRun()">&#9654;</button>
+  <button id='BtnInitMet'  class="btnMetro" style="left:44px;" onclick="InitMet()">&#x1F5D8;</button>
+  <input type="number" id="bpm" value="60">
+  <div id='HeadSongBpm' style="position:absolute;top:18px;left:2px;font-size:36px;">
+  </div>
+  <div id='HeadMesureCounter' style="position:absolute;top:-14px;left:110px;font-size:16px;">
+  --
+  </div>
+ </div>
+ <div id='videDiv' style="width:130px" >
+ <ins id='HeadCounterArray' style="font-size:2px;" >1;1;1;3;3;3;4;4;4;4;4;4;4;4;</ins>
+    </div>
+    <div>
+      <svg width="70" height="55" y='50' viewBox="0 0 70 55">
+      <rect style="fill:#fff" width='55' height='55' x='10' y='0' rx='25' ry='25'/>
+      <text class='TXT_START' id='HeadSongStart' x='18' y='15'></text>
+      </svg>
+    </div>
+    <div id='HeadSongName' style="font-size:36px" >
+      DIRTY MONKEYS V2
+    </div>
+   </div>
+        </header>
+        <main>
+   <div id="IdPage_00" class="page">
+ <div class="ChildPage">
+  <div class="item itemHead">
+    <ins id="InsSongNamePage_00" >MENU DIRTY MONKEYS V2</ins>
+ <ins id="InsSongBpmPage_00" >&#9833; -1</ins>
+ <ins id="InsSongSartPage_00" ></ins>
+ <ins id="InsSongBpmVALPage_00" >-1</ins>
+ <ins id="InsCounterArrayPage_00" >[PARCOUNTER]</ins>
+  </div>
+   <div class="item itemMain" id="DivSvgIdPage_00">
+     <div class="flex-menu"><div onclick="showPage('01')">01 &#9833;  152 PIPELINE </div>
+<div onclick="showPage('02')">02 &#9833;  144 TENNAGE KIDS </div>
+<div onclick="showPage('03')">03 &#9833;  154 The KKK Took My Baby </div>
+<div onclick="showPage('04')">04 &#9833;  95 BRANLEUR </div>
+<div onclick="showPage('05')">05 &#9833;  106 WILL THING </div>
+<div onclick="showPage('06')">06 &#9833;  114 CAN T SEEM TO ... </div>
+<div onclick="showPage('07')">07 &#9833;  114 SHE S THE ONE </div>
+<div onclick="showPage('08')">08 &#9833;  154 COME ON ... </div>
+<div onclick="showPage('09')">09 &#9833;  144 GET IT ON </div>
+</div>
+   </div>
+  <div class="item itemFoot"></div>
+ </div>
+</div>
+<div id="IdPage_01" class="page">
+ <div class="ChildPage">
+  <div class="item itemHead">
+    <ins id="InsSongNamePage_01" >PIPELINE</ins>
+ <ins id="InsSongBpmPage_01" >&#9833; 152</ins>
+ <ins id="InsSongSartPage_01" >PT</ins>
+ <ins id="InsSongBpmVALPage_01" >152</ins>
+ <ins id="InsCounterArrayPage_01" >1;1;3;3;4;4;4;4;4;4;4;4;5;5;5;5;5;5;5;5;3;3;4;4;4;4;4;4;4;4;5;5;5;5;5;5;5;5;7;7;7;7;7;7;7;7;7;7;7;7;8;8;9;9;9;9;9;9;9;9;10;10;11;11;11;11;11;11;11;11;12;12;12;12;12;12;12;12;</ins>
+  </div>
+   <div class="item itemMain" id="DivSvgIdPage_01">
+     <div class="flex-container"><div class='PartElement' id='Song_01_Part_1'>
+ <svg width="60" height="64" x='0' y='0' viewBox="0 0 60 64">
+   <rect style="fill:#bdc3c7" width='58' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>X</text>
+   <text class='TXT_MES' x='60' y='2'>2</text>
+   
+   <text class='TXT_NOTE' x='0' y='63'></text>
+ </svg>
+</div><svg width="30" height="64" x='114' y='0' viewBox="0 0 30 64">
+  <rect style="fill:#000" width='10' height='48' x='10' y='1' rx='2' ry='1'/>
+  <rect style="fill:#000" width='4' height='48' x='24' y='1' rx='2' ry='1'/>
+  <text class='TXT_NOTE' x='0' y='63'></text>
+</svg><div class='PartElement' id='Song_01_Part_3'>
+ <svg width="60" height="64" x='228' y='0' viewBox="0 0 60 64">
+   <rect style="fill:#f1c40f" width='58' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>I</text>
+   <text class='TXT_MES' x='60' y='2'>2</text>
+   
+   <text class='TXT_NOTE' x='0' y='63'></text>
+ </svg>
+</div><div class='PartElement' id='Song_01_Part_4'>
+ <svg width="84" height="64" x='342' y='0' viewBox="0 0 84 64">
+   <rect style="fill:#27ae60" width='82' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>V</text>
+   <text class='TXT_MES' x='84' y='2'>8</text>
+     <svg width='16' height='16' x='48' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>1</text>
+  </svg>
+  <svg width='16' height='16' x='64' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>2</text>
+  </svg>
+
+   <text class='TXT_NOTE' x='0' y='63'></text>
+ </svg>
+</div><div class='PartElement' id='Song_01_Part_5'>
+ <svg width="84" height="64" x='456' y='0' viewBox="0 0 84 64">
+   <rect style="fill:#2980b9" width='82' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>C</text>
+   <text class='TXT_MES' x='84' y='2'>8</text>
+     <svg width='16' height='16' x='48' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>1</text>
+  </svg>
+  <svg width='16' height='16' x='64' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>2</text>
+  </svg>
+
+   <text class='TXT_NOTE' x='0' y='63'></text>
+ </svg>
+</div><svg width="30" height="64" x='570' y='0' viewBox="0 0 30 64">
+  <rect style="fill:#000" width='4' height='48' x='4' y='1' rx='2' ry='1'/>
+  <rect style="fill:#000" width='10' height='48' x='10' y='1' rx='2' ry='1'/>
+  <text class='TXT_NOTE' x='0' y='63'></text>
+</svg><div class='PartElement' id='Song_01_Part_7'>
+ <svg width="100" height="64" x='684' y='0' viewBox="0 0 100 64">
+   <rect style="fill:#34495e" width='98' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>B</text>
+   <text class='TXT_MES' x='100' y='2'>12</text>
+     <svg width='16' height='16' x='48' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>1</text>
+  </svg>
+  <svg width='16' height='16' x='64' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>2</text>
+  </svg>
+  <svg width='16' height='16' x='80' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>3</text>
+  </svg>
+
+   <text class='TXT_NOTE' x='0' y='63'></text>
+ </svg>
+</div><div class='PartElement' id='Song_01_Part_8'>
+ <svg width="68" height="64" x='798' y='0' viewBox="0 0 68 64">
+   <rect style="fill:#bdc3c7" width='66' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>X</text>
+   <text class='TXT_MES' x='68' y='2'>2</text>
+     <svg width='16' height='16' x='48' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>1</text>
+  </svg>
+
+   <text class='TXT_NOTE' x='0' y='63'>STOP</text>
+ </svg>
+</div><div class='PartElement' id='Song_01_Part_9'>
+ <svg width="84" height="64" x='912' y='0' viewBox="0 0 84 64">
+   <rect style="fill:#27ae60" width='82' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>V</text>
+   <text class='TXT_MES' x='84' y='2'>8</text>
+     <svg width='16' height='16' x='48' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>1</text>
+  </svg>
+  <svg width='16' height='16' x='64' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>2</text>
+  </svg>
+
+   <text class='TXT_NOTE' x='0' y='63'></text>
+ </svg>
+</div><div class='PartElement' id='Song_01_Part_10'>
+ <svg width="60" height="64" x='1026' y='0' viewBox="0 0 60 64">
+   <rect style="fill:#f1c40f" width='58' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>I</text>
+   <text class='TXT_MES' x='60' y='2'>2</text>
+   
+   <text class='TXT_NOTE' x='0' y='63'></text>
+ </svg>
+</div><div class='PartElement' id='Song_01_Part_11'>
+ <svg width="84" height="64" x='1140' y='0' viewBox="0 0 84 64">
+   <rect style="fill:#27ae60" width='82' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>V</text>
+   <text class='TXT_MES' x='84' y='2'>8</text>
+     <svg width='16' height='16' x='48' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>1</text>
+  </svg>
+  <svg width='16' height='16' x='64' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>2</text>
+  </svg>
+
+   <text class='TXT_NOTE' x='0' y='63'></text>
+ </svg>
+</div><div class='PartElement' id='Song_01_Part_12'>
+ <svg width="84" height="64" x='1254' y='0' viewBox="0 0 84 64">
+   <rect style="fill:#996633" width='82' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>O</text>
+   <text class='TXT_MES' x='84' y='2'>8</text>
+     <svg width='16' height='16' x='48' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>1</text>
+  </svg>
+  <svg width='16' height='16' x='64' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>2</text>
+  </svg>
+
+   <text class='TXT_NOTE' x='0' y='63'></text>
+ </svg>
+</div></div>
+
+   </div>
+  <div class="item itemFoot"></div>
+ </div>
+</div>
+<div id="IdPage_02" class="page">
+ <div class="ChildPage">
+  <div class="item itemHead">
+    <ins id="InsSongNamePage_02" >TENNAGE KIDS</ins>
+ <ins id="InsSongBpmPage_02" >&#9833; 144</ins>
+ <ins id="InsSongSartPage_02" >SA</ins>
+ <ins id="InsSongBpmVALPage_02" >144</ins>
+ <ins id="InsCounterArrayPage_02" >1;1;1;1;1;1;1;1;2;2;2;2;2;2;2;2;3;3;3;3;5;5;5;5;5;5;5;5;6;6;6;6;7;7;7;7;7;7;7;7;5;5;5;5;5;5;5;5;6;6;6;6;7;7;7;7;7;7;7;7;9;9;9;9;10;10;</ins>
+  </div>
+   <div class="item itemMain" id="DivSvgIdPage_02">
+     <div class="flex-container"><div class='PartElement' id='Song_02_Part_1'>
+ <svg width="84" height="64" x='0' y='0' viewBox="0 0 84 64">
+   <rect style="fill:#f1c40f" width='82' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>I</text>
+   <text class='TXT_MES' x='84' y='2'>8</text>
+     <svg width='16' height='16' x='48' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>1</text>
+  </svg>
+  <svg width='16' height='16' x='64' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>2</text>
+  </svg>
+
+   <text class='TXT_NOTE' x='0' y='63'></text>
+ </svg>
+</div><div class='PartElement' id='Song_02_Part_2'>
+ <svg width="84" height="64" x='114' y='0' viewBox="0 0 84 64">
+   <rect style="fill:#27ae60" width='82' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>V</text>
+   <text class='TXT_MES' x='84' y='2'>8</text>
+     <svg width='16' height='16' x='48' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>1</text>
+  </svg>
+  <svg width='16' height='16' x='64' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>2</text>
+  </svg>
+
+   <text class='TXT_NOTE' x='0' y='63'></text>
+ </svg>
+</div><div class='PartElement' id='Song_02_Part_3'>
+ <svg width="68" height="64" x='228' y='0' viewBox="0 0 68 64">
+   <rect style="fill:#2980b9" width='66' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>C</text>
+   <text class='TXT_MES' x='68' y='2'>4</text>
+   
+   <text class='TXT_NOTE' x='0' y='63'></text>
+ </svg>
+</div><svg width="30" height="64" x='342' y='0' viewBox="0 0 30 64">
+  <rect style="fill:#000" width='10' height='48' x='10' y='1' rx='2' ry='1'/>
+  <rect style="fill:#000" width='4' height='48' x='24' y='1' rx='2' ry='1'/>
+  <text class='TXT_NOTE' x='0' y='63'></text>
+</svg><div class='PartElement' id='Song_02_Part_5'>
+ <svg width="84" height="64" x='456' y='0' viewBox="0 0 84 64">
+   <rect style="fill:#27ae60" width='82' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>V</text>
+   <text class='TXT_MES' x='84' y='2'>8</text>
+     <svg width='16' height='16' x='48' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>1</text>
+  </svg>
+  <svg width='16' height='16' x='64' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>2</text>
+  </svg>
+
+   <text class='TXT_NOTE' x='0' y='63'></text>
+ </svg>
+</div><div class='PartElement' id='Song_02_Part_6'>
+ <svg width="68" height="64" x='570' y='0' viewBox="0 0 68 64">
+   <rect style="fill:#2980b9" width='66' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>C</text>
+   <text class='TXT_MES' x='68' y='2'>4</text>
+   
+   <text class='TXT_NOTE' x='0' y='63'></text>
+ </svg>
+</div><div class='PartElement' id='Song_02_Part_7'>
+ <svg width="84" height="64" x='684' y='0' viewBox="0 0 84 64">
+   <rect style="fill:#34495e" width='82' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>B</text>
+   <text class='TXT_MES' x='84' y='2'>8</text>
+     <svg width='16' height='16' x='48' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>1</text>
+  </svg>
+  <svg width='16' height='16' x='64' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>2</text>
+  </svg>
+
+   <text class='TXT_NOTE' x='0' y='63'></text>
+ </svg>
+</div><svg width="30" height="64" x='798' y='0' viewBox="0 0 30 64">
+  <rect style="fill:#000" width='4' height='48' x='4' y='1' rx='2' ry='1'/>
+  <rect style="fill:#000" width='10' height='48' x='10' y='1' rx='2' ry='1'/>
+  <text class='TXT_NOTE' x='0' y='63'></text>
+</svg><div class='PartElement' id='Song_02_Part_9'>
+ <svg width="68" height="64" x='912' y='0' viewBox="0 0 68 64">
+   <rect style="fill:#2980b9" width='66' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>C</text>
+   <text class='TXT_MES' x='68' y='2'>4</text>
+   
+   <text class='TXT_NOTE' x='0' y='63'></text>
+ </svg>
+</div><div class='PartElement' id='Song_02_Part_10'>
+ <svg width="68" height="64" x='1026' y='0' viewBox="0 0 68 64">
+   <rect style="fill:#996633" width='66' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>O</text>
+   <text class='TXT_MES' x='68' y='2'>2</text>
+     <svg width='16' height='16' x='48' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>1</text>
+  </svg>
+
+   <text class='TXT_NOTE' x='0' y='63'></text>
+ </svg>
+</div></div>
+
+   </div>
+  <div class="item itemFoot"></div>
+ </div>
+</div>
+<div id="IdPage_03" class="page">
+ <div class="ChildPage">
+  <div class="item itemHead">
+    <ins id="InsSongNamePage_03" >The KKK Took My Baby</ins>
+ <ins id="InsSongBpmPage_03" >&#9833; 154</ins>
+ <ins id="InsSongSartPage_03" ></ins>
+ <ins id="InsSongBpmVALPage_03" >154</ins>
+ <ins id="InsCounterArrayPage_03" >1;1;1;1;2;2;2;2;2;2;2;2;2;2;2;2;2;2;2;2;3;3;3;3;3;3;3;3;4;4;4;4;5;5;5;5;5;5;5;5;6;6;6;6;6;6;6;6;6;7;7;7;7;7;7;7;7;7;7;7;8;8;8;8;8;8;8;8;8;8;8;8;8;8;8;8;8;8;8;8;8;8;8;8;8;8;8;8;8;8;8;8;</ins>
+  </div>
+   <div class="item itemMain" id="DivSvgIdPage_03">
+     <div class="flex-container"><div class='PartElement' id='Song_03_Part_1'>
+ <svg width="68" height="64" x='0' y='0' viewBox="0 0 68 64">
+   <rect style="fill:#f1c40f" width='66' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>I</text>
+   <text class='TXT_MES' x='68' y='2'>4</text>
+   
+   <text class='TXT_NOTE' x='0' y='63'></text>
+ </svg>
+</div><div class='PartElement' id='Song_03_Part_2'>
+ <svg width="116" height="64" x='114' y='0' viewBox="0 0 116 64">
+   <rect style="fill:#27ae60" width='114' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>V</text>
+   <text class='TXT_MES' x='116' y='2'>16</text>
+     <svg width='16' height='16' x='48' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>1</text>
+  </svg>
+  <svg width='16' height='16' x='64' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>2</text>
+  </svg>
+  <svg width='16' height='16' x='80' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>3</text>
+  </svg>
+  <svg width='16' height='16' x='96' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>4</text>
+  </svg>
+
+   <text class='TXT_NOTE' x='0' y='63'></text>
+ </svg>
+</div><div class='PartElement' id='Song_03_Part_3'>
+ <svg width="84" height="64" x='228' y='0' viewBox="0 0 84 64">
+   <rect style="fill:#2980b9" width='82' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>C</text>
+   <text class='TXT_MES' x='84' y='2'>8</text>
+     <svg width='16' height='16' x='48' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>1</text>
+  </svg>
+  <svg width='16' height='16' x='64' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>2</text>
+  </svg>
+
+   <text class='TXT_NOTE' x='0' y='63'></text>
+ </svg>
+</div><div class='PartElement' id='Song_03_Part_4'>
+ <svg width="68" height="64" x='342' y='0' viewBox="0 0 68 64">
+   <rect style="fill:#f1c40f" width='66' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>I</text>
+   <text class='TXT_MES' x='68' y='2'>4</text>
+   
+   <text class='TXT_NOTE' x='0' y='63'></text>
+ </svg>
+</div><div class='PartElement' id='Song_03_Part_5'>
+ <svg width="84" height="64" x='456' y='0' viewBox="0 0 84 64">
+   <rect style="fill:#27ae60" width='82' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>V</text>
+   <text class='TXT_MES' x='84' y='2'>8</text>
+     <svg width='16' height='16' x='48' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>1</text>
+  </svg>
+  <svg width='16' height='16' x='64' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>2</text>
+  </svg>
+
+   <text class='TXT_NOTE' x='0' y='63'></text>
+ </svg>
+</div><div class='PartElement' id='Song_03_Part_6'>
+ <svg width="100" height="64" x='570' y='0' viewBox="0 0 100 64">
+   <rect style="fill:#2980b9" width='98' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>C</text>
+   <text class='TXT_MES' x='100' y='2'>9</text>
+     <svg width='16' height='16' x='48' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>1</text>
+  </svg>
+  <svg width='16' height='16' x='64' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>2</text>
+  </svg>
+  <svg width='16' height='16' x='80' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>3</text>
+  </svg>
+
+   <text class='TXT_NOTE' x='0' y='63'></text>
+ </svg>
+</div><div class='PartElement' id='Song_03_Part_7'>
+ <svg width="100" height="64" x='684' y='0' viewBox="0 0 100 64">
+   <rect style="fill:#f1c40f" width='98' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>I</text>
+   <text class='TXT_MES' x='100' y='2'>11</text>
+     <svg width='16' height='16' x='48' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>1</text>
+  </svg>
+  <svg width='16' height='16' x='64' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>2</text>
+  </svg>
+  <svg width='16' height='16' x='80' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>3</text>
+  </svg>
+
+   <text class='TXT_NOTE' x='0' y='63'></text>
+ </svg>
+</div><div class='PartElement' id='Song_03_Part_8'>
+ <svg width="180" height="64" x='798' y='0' viewBox="0 0 180 64">
+   <rect style="fill:#996633" width='178' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>O</text>
+   <text class='TXT_MES' x='180' y='2'>32</text>
+     <svg width='16' height='16' x='112' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>1</text>
+  </svg>
+  <svg width='16' height='16' x='128' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>2</text>
+  </svg>
+  <svg width='16' height='16' x='144' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>3</text>
+  </svg>
+  <svg width='16' height='16' x='160' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>4</text>
+  </svg>
+
+   <text class='TXT_NOTE' x='0' y='63'> +1Mes (1234)</text>
+ </svg>
+</div></div>
+
+   </div>
+  <div class="item itemFoot"></div>
+ </div>
+</div>
+<div id="IdPage_04" class="page">
+ <div class="ChildPage">
+  <div class="item itemHead">
+    <ins id="InsSongNamePage_04" >BRANLEUR</ins>
+ <ins id="InsSongBpmPage_04" >&#9833; 95</ins>
+ <ins id="InsSongSartPage_04" >SA</ins>
+ <ins id="InsSongBpmVALPage_04" >95</ins>
+ <ins id="InsCounterArrayPage_04" >1;1;1;1;1;1;1;1;3;3;3;3;3;3;3;3;4;4;4;4;4;4;4;4;5;5;3;3;3;3;3;3;3;3;4;4;4;4;4;4;4;4;5;5;7;7;7;7;7;7;7;7;8;8;8;8;8;8;8;8;9;9;</ins>
+  </div>
+   <div class="item itemMain" id="DivSvgIdPage_04">
+     <div class="flex-container"><div class='PartElement' id='Song_04_Part_1'>
+ <svg width="84" height="64" x='0' y='0' viewBox="0 0 84 64">
+   <rect style="fill:#f1c40f" width='82' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>I</text>
+   <text class='TXT_MES' x='84' y='2'>8</text>
+     <svg width='16' height='16' x='48' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>1</text>
+  </svg>
+  <svg width='16' height='16' x='64' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>2</text>
+  </svg>
+
+   <text class='TXT_NOTE' x='0' y='63'></text>
+ </svg>
+</div><svg width="30" height="64" x='114' y='0' viewBox="0 0 30 64">
+  <rect style="fill:#000" width='10' height='48' x='10' y='1' rx='2' ry='1'/>
+  <rect style="fill:#000" width='4' height='48' x='24' y='1' rx='2' ry='1'/>
+  <text class='TXT_NOTE' x='0' y='63'></text>
+</svg><div class='PartElement' id='Song_04_Part_3'>
+ <svg width="84" height="64" x='228' y='0' viewBox="0 0 84 64">
+   <rect style="fill:#27ae60" width='82' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>V</text>
+   <text class='TXT_MES' x='84' y='2'>8</text>
+     <svg width='16' height='16' x='48' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>1</text>
+  </svg>
+  <svg width='16' height='16' x='64' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>2</text>
+  </svg>
+
+   <text class='TXT_NOTE' x='0' y='63'></text>
+ </svg>
+</div><div class='PartElement' id='Song_04_Part_4'>
+ <svg width="84" height="64" x='342' y='0' viewBox="0 0 84 64">
+   <rect style="fill:#2980b9" width='82' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>C</text>
+   <text class='TXT_MES' x='84' y='2'>8</text>
+     <svg width='16' height='16' x='48' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>1</text>
+  </svg>
+  <svg width='16' height='16' x='64' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>2</text>
+  </svg>
+
+   <text class='TXT_NOTE' x='0' y='63'></text>
+ </svg>
+</div><div class='PartElement' id='Song_04_Part_5'>
+ <svg width="60" height="64" x='456' y='0' viewBox="0 0 60 64">
+   <rect style="fill:#f1c40f" width='58' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>I</text>
+   <text class='TXT_MES' x='60' y='2'>2</text>
+   
+   <text class='TXT_NOTE' x='0' y='63'></text>
+ </svg>
+</div><svg width="30" height="64" x='570' y='0' viewBox="0 0 30 64">
+  <rect style="fill:#000" width='4' height='48' x='4' y='1' rx='2' ry='1'/>
+  <rect style="fill:#000" width='10' height='48' x='10' y='1' rx='2' ry='1'/>
+  <text class='TXT_NOTE' x='0' y='63'></text>
+</svg><div class='PartElement' id='Song_04_Part_7'>
+ <svg width="84" height="64" x='684' y='0' viewBox="0 0 84 64">
+   <rect style="fill:#34495e" width='82' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>B</text>
+   <text class='TXT_MES' x='84' y='2'>8</text>
+     <svg width='16' height='16' x='48' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>1</text>
+  </svg>
+  <svg width='16' height='16' x='64' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>2</text>
+  </svg>
+
+   <text class='TXT_NOTE' x='0' y='63'></text>
+ </svg>
+</div><div class='PartElement' id='Song_04_Part_8'>
+ <svg width="84" height="64" x='798' y='0' viewBox="0 0 84 64">
+   <rect style="fill:#2980b9" width='82' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>C</text>
+   <text class='TXT_MES' x='84' y='2'>8</text>
+     <svg width='16' height='16' x='48' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>1</text>
+  </svg>
+  <svg width='16' height='16' x='64' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>2</text>
+  </svg>
+
+   <text class='TXT_NOTE' x='0' y='63'></text>
+ </svg>
+</div><div class='PartElement' id='Song_04_Part_9'>
+ <svg width="68" height="64" x='912' y='0' viewBox="0 0 68 64">
+   <rect style="fill:#996633" width='66' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>O</text>
+   <text class='TXT_MES' x='68' y='2'>2</text>
+     <svg width='16' height='16' x='48' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>1</text>
+  </svg>
+
+   <text class='TXT_NOTE' x='0' y='63'></text>
+ </svg>
+</div></div>
+
+   </div>
+  <div class="item itemFoot"></div>
+ </div>
+</div>
+<div id="IdPage_05" class="page">
+ <div class="ChildPage">
+  <div class="item itemHead">
+    <ins id="InsSongNamePage_05" >WILL THING</ins>
+ <ins id="InsSongBpmPage_05" >&#9833; 106</ins>
+ <ins id="InsSongSartPage_05" ></ins>
+ <ins id="InsSongBpmVALPage_05" >106</ins>
+ <ins id="InsCounterArrayPage_05" >1;1;1;1;1;1;1;1;2;2;2;2;2;2;2;2;3;3;3;3;3;3;3;3;4;4;4;4;4;4;4;4;5;5;5;5;5;5;5;5;6;6;6;6;6;6;6;7;7;7;7;7;7;7;7;7;7;7;7;7;7;7;7;</ins>
+  </div>
+   <div class="item itemMain" id="DivSvgIdPage_05">
+     <div class="flex-container"><div class='PartElement' id='Song_05_Part_1'>
+ <svg width="84" height="64" x='0' y='0' viewBox="0 0 84 64">
+   <rect style="fill:#f1c40f" width='82' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>I</text>
+   <text class='TXT_MES' x='84' y='2'>8</text>
+     <svg width='16' height='16' x='48' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>1</text>
+  </svg>
+  <svg width='16' height='16' x='64' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>2</text>
+  </svg>
+
+   <text class='TXT_NOTE' x='0' y='63'></text>
+ </svg>
+</div><div class='PartElement' id='Song_05_Part_2'>
+ <svg width="84" height="64" x='114' y='0' viewBox="0 0 84 64">
+   <rect style="fill:#27ae60" width='82' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>V</text>
+   <text class='TXT_MES' x='84' y='2'>8</text>
+     <svg width='16' height='16' x='48' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>1</text>
+  </svg>
+  <svg width='16' height='16' x='64' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>2</text>
+  </svg>
+
+   <text class='TXT_NOTE' x='0' y='63'></text>
+ </svg>
+</div><div class='PartElement' id='Song_05_Part_3'>
+ <svg width="84" height="64" x='228' y='0' viewBox="0 0 84 64">
+   <rect style="fill:#bdc3c7" width='82' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>X</text>
+   <text class='TXT_MES' x='84' y='2'>8</text>
+     <svg width='16' height='16' x='48' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>1</text>
+  </svg>
+  <svg width='16' height='16' x='64' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>2</text>
+  </svg>
+
+   <text class='TXT_NOTE' x='0' y='63'></text>
+ </svg>
+</div><div class='PartElement' id='Song_05_Part_4'>
+ <svg width="84" height="64" x='342' y='0' viewBox="0 0 84 64">
+   <rect style="fill:#27ae60" width='82' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>V</text>
+   <text class='TXT_MES' x='84' y='2'>8</text>
+     <svg width='16' height='16' x='48' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>1</text>
+  </svg>
+  <svg width='16' height='16' x='64' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>2</text>
+  </svg>
+
+   <text class='TXT_NOTE' x='0' y='63'></text>
+ </svg>
+</div><div class='PartElement' id='Song_05_Part_5'>
+ <svg width="84" height="64" x='456' y='0' viewBox="0 0 84 64">
+   <rect style="fill:#c0392b" width='82' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>S</text>
+   <text class='TXT_MES' x='84' y='2'>8</text>
+     <svg width='16' height='16' x='48' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>1</text>
+  </svg>
+  <svg width='16' height='16' x='64' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>2</text>
+  </svg>
+
+   <text class='TXT_NOTE' x='0' y='63'></text>
+ </svg>
+</div><div class='PartElement' id='Song_05_Part_6'>
+ <svg width="84" height="64" x='570' y='0' viewBox="0 0 84 64">
+   <rect style="fill:#f1c40f" width='82' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>I</text>
+   <text class='TXT_MES' x='84' y='2'>7</text>
+     <svg width='16' height='16' x='48' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>1</text>
+  </svg>
+  <svg width='16' height='16' x='64' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>2</text>
+  </svg>
+
+   <text class='TXT_NOTE' x='0' y='63'></text>
+ </svg>
+</div><div class='PartElement' id='Song_05_Part_7'>
+ <svg width="116" height="64" x='684' y='0' viewBox="0 0 116 64">
+   <rect style="fill:#996633" width='114' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>O</text>
+   <text class='TXT_MES' x='116' y='2'>16</text>
+     <svg width='16' height='16' x='48' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>1</text>
+  </svg>
+  <svg width='16' height='16' x='64' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>2</text>
+  </svg>
+  <svg width='16' height='16' x='80' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>3</text>
+  </svg>
+  <svg width='16' height='16' x='96' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>4</text>
+  </svg>
+
+   <text class='TXT_NOTE' x='0' y='63'></text>
+ </svg>
+</div></div>
+
+   </div>
+  <div class="item itemFoot"></div>
+ </div>
+</div>
+<div id="IdPage_06" class="page">
+ <div class="ChildPage">
+  <div class="item itemHead">
+    <ins id="InsSongNamePage_06" >CAN T SEEM TO ...</ins>
+ <ins id="InsSongBpmPage_06" >&#9833; 114</ins>
+ <ins id="InsSongSartPage_06" ></ins>
+ <ins id="InsSongBpmVALPage_06" >114</ins>
+ <ins id="InsCounterArrayPage_06" >1;1;1;1;2;2;2;2;2;2;2;2;2;2;2;2;2;2;2;2;3;3;3;3;3;3;4;4;5;5;5;5;5;5;5;5;5;5;5;5;5;5;5;5;6;6;6;6;6;6;6;6;7;7;7;7;7;7;8;8;9;9;9;9;9;9;9;9;9;9;9;9;9;9;9;9;10;10;10;10;10;10;10;10;</ins>
+  </div>
+   <div class="item itemMain" id="DivSvgIdPage_06">
+     <div class="flex-container"><div class='PartElement' id='Song_06_Part_1'>
+ <svg width="68" height="64" x='0' y='0' viewBox="0 0 68 64">
+   <rect style="fill:#f1c40f" width='66' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>I</text>
+   <text class='TXT_MES' x='68' y='2'>4</text>
+   
+   <text class='TXT_NOTE' x='0' y='63'></text>
+ </svg>
+</div><div class='PartElement' id='Song_06_Part_2'>
+ <svg width="116" height="64" x='114' y='0' viewBox="0 0 116 64">
+   <rect style="fill:#27ae60" width='114' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>V</text>
+   <text class='TXT_MES' x='116' y='2'>16</text>
+     <svg width='16' height='16' x='48' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>1</text>
+  </svg>
+  <svg width='16' height='16' x='64' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>2</text>
+  </svg>
+  <svg width='16' height='16' x='80' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>3</text>
+  </svg>
+  <svg width='16' height='16' x='96' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>4</text>
+  </svg>
+
+   <text class='TXT_NOTE' x='0' y='63'></text>
+ </svg>
+</div><div class='PartElement' id='Song_06_Part_3'>
+ <svg width="84" height="64" x='228' y='0' viewBox="0 0 84 64">
+   <rect style="fill:#2980b9" width='82' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>C</text>
+   <text class='TXT_MES' x='84' y='2'>6</text>
+     <svg width='16' height='16' x='48' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>1</text>
+  </svg>
+  <svg width='16' height='16' x='64' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>2</text>
+  </svg>
+
+   <text class='TXT_NOTE' x='0' y='63'></text>
+ </svg>
+</div><div class='PartElement' id='Song_06_Part_4'>
+ <svg width="68" height="64" x='342' y='0' viewBox="0 0 68 64">
+   <rect style="fill:#bdc3c7" width='66' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>X</text>
+   <text class='TXT_MES' x='68' y='2'>2</text>
+     <svg width='16' height='16' x='48' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>1</text>
+  </svg>
+
+   <text class='TXT_NOTE' x='0' y='63'></text>
+ </svg>
+</div><div class='PartElement' id='Song_06_Part_5'>
+ <svg width="116" height="64" x='456' y='0' viewBox="0 0 116 64">
+   <rect style="fill:#27ae60" width='114' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>V</text>
+   <text class='TXT_MES' x='116' y='2'>16</text>
+     <svg width='16' height='16' x='48' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>1</text>
+  </svg>
+  <svg width='16' height='16' x='64' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>2</text>
+  </svg>
+  <svg width='16' height='16' x='80' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>3</text>
+  </svg>
+  <svg width='16' height='16' x='96' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>4</text>
+  </svg>
+
+   <text class='TXT_NOTE' x='0' y='63'></text>
+ </svg>
+</div><div class='PartElement' id='Song_06_Part_6'>
+ <svg width="84" height="64" x='570' y='0' viewBox="0 0 84 64">
+   <rect style="fill:#c0392b" width='82' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>S</text>
+   <text class='TXT_MES' x='84' y='2'>8</text>
+     <svg width='16' height='16' x='48' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>1</text>
+  </svg>
+  <svg width='16' height='16' x='64' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>2</text>
+  </svg>
+
+   <text class='TXT_NOTE' x='0' y='63'></text>
+ </svg>
+</div><div class='PartElement' id='Song_06_Part_7'>
+ <svg width="84" height="64" x='684' y='0' viewBox="0 0 84 64">
+   <rect style="fill:#2980b9" width='82' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>C</text>
+   <text class='TXT_MES' x='84' y='2'>6</text>
+     <svg width='16' height='16' x='48' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>1</text>
+  </svg>
+  <svg width='16' height='16' x='64' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>2</text>
+  </svg>
+
+   <text class='TXT_NOTE' x='0' y='63'></text>
+ </svg>
+</div><div class='PartElement' id='Song_06_Part_8'>
+ <svg width="68" height="64" x='798' y='0' viewBox="0 0 68 64">
+   <rect style="fill:#bdc3c7" width='66' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>X</text>
+   <text class='TXT_MES' x='68' y='2'>2</text>
+     <svg width='16' height='16' x='48' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>1</text>
+  </svg>
+
+   <text class='TXT_NOTE' x='0' y='63'></text>
+ </svg>
+</div><div class='PartElement' id='Song_06_Part_9'>
+ <svg width="116" height="64" x='912' y='0' viewBox="0 0 116 64">
+   <rect style="fill:#27ae60" width='114' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>V</text>
+   <text class='TXT_MES' x='116' y='2'>16</text>
+     <svg width='16' height='16' x='48' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>1</text>
+  </svg>
+  <svg width='16' height='16' x='64' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>2</text>
+  </svg>
+  <svg width='16' height='16' x='80' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>3</text>
+  </svg>
+  <svg width='16' height='16' x='96' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>4</text>
+  </svg>
+
+   <text class='TXT_NOTE' x='0' y='63'></text>
+ </svg>
+</div><div class='PartElement' id='Song_06_Part_10'>
+ <svg width="84" height="64" x='1026' y='0' viewBox="0 0 84 64">
+   <rect style="fill:#996633" width='82' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>O</text>
+   <text class='TXT_MES' x='84' y='2'>8</text>
+     <svg width='16' height='16' x='48' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>1</text>
+  </svg>
+  <svg width='16' height='16' x='64' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>2</text>
+  </svg>
+
+   <text class='TXT_NOTE' x='0' y='63'></text>
+ </svg>
+</div></div>
+
+   </div>
+  <div class="item itemFoot"></div>
+ </div>
+</div>
+<div id="IdPage_07" class="page">
+ <div class="ChildPage">
+  <div class="item itemHead">
+    <ins id="InsSongNamePage_07" >SHE S THE ONE</ins>
+ <ins id="InsSongBpmPage_07" >&#9833; 114</ins>
+ <ins id="InsSongSartPage_07" ></ins>
+ <ins id="InsSongBpmVALPage_07" >114</ins>
+ <ins id="InsCounterArrayPage_07" >1;1;1;1;2;2;2;2;2;2;2;2;2;2;2;2;2;2;2;2;2;2;2;2;2;2;2;2;2;2;2;2;2;2;2;2;3;3;4;4;4;4;4;4;4;4;5;5;5;5;5;5;5;5;5;5;5;5;5;5;5;5;6;6;7;7;7;7;7;7;7;7;8;8;8;8;8;8;8;8;8;8;8;8;8;8;8;8;9;9;9;9;9;9;9;9;9;9;9;9;9;9;9;9;</ins>
+  </div>
+   <div class="item itemMain" id="DivSvgIdPage_07">
+     <div class="flex-container"><div class='PartElement' id='Song_07_Part_1'>
+ <svg width="68" height="64" x='0' y='0' viewBox="0 0 68 64">
+   <rect style="fill:#f1c40f" width='66' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>I</text>
+   <text class='TXT_MES' x='68' y='2'>4</text>
+   
+   <text class='TXT_NOTE' x='0' y='63'></text>
+ </svg>
+</div><div class='PartElement' id='Song_07_Part_2'>
+ <svg width="180" height="64" x='114' y='0' viewBox="0 0 180 64">
+   <rect style="fill:#2980b9" width='178' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>C</text>
+   <text class='TXT_MES' x='180' y='2'>32</text>
+     <svg width='16' height='16' x='48' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>1</text>
+  </svg>
+  <svg width='16' height='16' x='64' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>2</text>
+  </svg>
+  <svg width='16' height='16' x='80' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>3</text>
+  </svg>
+  <svg width='16' height='16' x='96' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>4</text>
+  </svg>
+  <svg width='16' height='16' x='112' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>5</text>
+  </svg>
+  <svg width='16' height='16' x='128' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>6</text>
+  </svg>
+  <svg width='16' height='16' x='144' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>7</text>
+  </svg>
+  <svg width='16' height='16' x='160' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>8</text>
+  </svg>
+
+   <text class='TXT_NOTE' x='0' y='63'></text>
+ </svg>
+</div><div class='PartElement' id='Song_07_Part_3'>
+ <svg width="60" height="64" x='228' y='0' viewBox="0 0 60 64">
+   <rect style="fill:#f1c40f" width='58' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>I</text>
+   <text class='TXT_MES' x='60' y='2'>2</text>
+   
+   <text class='TXT_NOTE' x='0' y='63'></text>
+ </svg>
+</div><div class='PartElement' id='Song_07_Part_4'>
+ <svg width="84" height="64" x='342' y='0' viewBox="0 0 84 64">
+   <rect style="fill:#27ae60" width='82' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>V</text>
+   <text class='TXT_MES' x='84' y='2'>8</text>
+     <svg width='16' height='16' x='48' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>1</text>
+  </svg>
+  <svg width='16' height='16' x='64' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>2</text>
+  </svg>
+
+   <text class='TXT_NOTE' x='0' y='63'></text>
+ </svg>
+</div><div class='PartElement' id='Song_07_Part_5'>
+ <svg width="116" height="64" x='456' y='0' viewBox="0 0 116 64">
+   <rect style="fill:#2980b9" width='114' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>C</text>
+   <text class='TXT_MES' x='116' y='2'>16</text>
+     <svg width='16' height='16' x='48' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>1</text>
+  </svg>
+  <svg width='16' height='16' x='64' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>2</text>
+  </svg>
+  <svg width='16' height='16' x='80' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>3</text>
+  </svg>
+  <svg width='16' height='16' x='96' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>4</text>
+  </svg>
+
+   <text class='TXT_NOTE' x='0' y='63'></text>
+ </svg>
+</div><div class='PartElement' id='Song_07_Part_6'>
+ <svg width="60" height="64" x='570' y='0' viewBox="0 0 60 64">
+   <rect style="fill:#f1c40f" width='58' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>I</text>
+   <text class='TXT_MES' x='60' y='2'>2</text>
+   
+   <text class='TXT_NOTE' x='0' y='63'></text>
+ </svg>
+</div><div class='PartElement' id='Song_07_Part_7'>
+ <svg width="84" height="64" x='684' y='0' viewBox="0 0 84 64">
+   <rect style="fill:#27ae60" width='82' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>V</text>
+   <text class='TXT_MES' x='84' y='2'>8</text>
+     <svg width='16' height='16' x='48' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>1</text>
+  </svg>
+  <svg width='16' height='16' x='64' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>2</text>
+  </svg>
+
+   <text class='TXT_NOTE' x='0' y='63'></text>
+ </svg>
+</div><div class='PartElement' id='Song_07_Part_8'>
+ <svg width="116" height="64" x='798' y='0' viewBox="0 0 116 64">
+   <rect style="fill:#2980b9" width='114' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>C</text>
+   <text class='TXT_MES' x='116' y='2'>16</text>
+     <svg width='16' height='16' x='48' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>1</text>
+  </svg>
+  <svg width='16' height='16' x='64' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>2</text>
+  </svg>
+  <svg width='16' height='16' x='80' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>3</text>
+  </svg>
+  <svg width='16' height='16' x='96' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>4</text>
+  </svg>
+
+   <text class='TXT_NOTE' x='0' y='63'></text>
+ </svg>
+</div><div class='PartElement' id='Song_07_Part_9'>
+ <svg width="116" height="64" x='912' y='0' viewBox="0 0 116 64">
+   <rect style="fill:#996633" width='114' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>O</text>
+   <text class='TXT_MES' x='116' y='2'>16</text>
+     <svg width='16' height='16' x='48' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>1</text>
+  </svg>
+  <svg width='16' height='16' x='64' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>2</text>
+  </svg>
+  <svg width='16' height='16' x='80' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>3</text>
+  </svg>
+  <svg width='16' height='16' x='96' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>4</text>
+  </svg>
+
+   <text class='TXT_NOTE' x='0' y='63'></text>
+ </svg>
+</div></div>
+
+   </div>
+  <div class="item itemFoot"></div>
+ </div>
+</div>
+<div id="IdPage_08" class="page">
+ <div class="ChildPage">
+  <div class="item itemHead">
+    <ins id="InsSongNamePage_08" >COME ON ...</ins>
+ <ins id="InsSongBpmPage_08" >&#9833; 154</ins>
+ <ins id="InsSongSartPage_08" >SA</ins>
+ <ins id="InsSongBpmVALPage_08" >154</ins>
+ <ins id="InsCounterArrayPage_08" >1;1;1;1;1;1;1;1;4;4;4;4;4;4;4;4;5;5;5;5;5;5;5;5;6;6;4;4;4;4;4;4;4;4;5;5;5;5;5;5;5;5;6;6;9;9;9;9;9;9;9;10;10;10;10;11;11;11;11;11;11;11;12;12;12;12;12;12;12;</ins>
+  </div>
+   <div class="item itemMain" id="DivSvgIdPage_08">
+     <div class="flex-container"><div class='PartElement' id='Song_08_Part_1'>
+ <svg width="84" height="64" x='0' y='0' viewBox="0 0 84 64">
+   <rect style="fill:#f1c40f" width='82' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>I</text>
+   <text class='TXT_MES' x='84' y='2'>8</text>
+     <svg width='16' height='16' x='48' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>1</text>
+  </svg>
+  <svg width='16' height='16' x='64' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>2</text>
+  </svg>
+
+   <text class='TXT_NOTE' x='0' y='63'></text>
+ </svg>
+</div><div>
+<svg width="16" height="64" x='114' y='0' viewBox="0 0 16 64">
+  
+
+  <text class='TXT_NOTE' x='0' y='63'></text>
+</svg>
+</div><svg width="30" height="64" x='228' y='0' viewBox="0 0 30 64">
+  <rect style="fill:#000" width='10' height='48' x='10' y='1' rx='2' ry='1'/>
+  <rect style="fill:#000" width='4' height='48' x='24' y='1' rx='2' ry='1'/>
+  <text class='TXT_NOTE' x='0' y='63'></text>
+</svg><div class='PartElement' id='Song_08_Part_4'>
+ <svg width="84" height="64" x='342' y='0' viewBox="0 0 84 64">
+   <rect style="fill:#2980b9" width='82' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>C</text>
+   <text class='TXT_MES' x='84' y='2'>8</text>
+     <svg width='16' height='16' x='48' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>1</text>
+  </svg>
+  <svg width='16' height='16' x='64' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>2</text>
+  </svg>
+
+   <text class='TXT_NOTE' x='0' y='63'></text>
+ </svg>
+</div><div class='PartElement' id='Song_08_Part_5'>
+ <svg width="84" height="64" x='456' y='0' viewBox="0 0 84 64">
+   <rect style="fill:#27ae60" width='82' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>V</text>
+   <text class='TXT_MES' x='84' y='2'>8</text>
+     <svg width='16' height='16' x='48' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>1</text>
+  </svg>
+  <svg width='16' height='16' x='64' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>2</text>
+  </svg>
+
+   <text class='TXT_NOTE' x='0' y='63'></text>
+ </svg>
+</div><div class='PartElement' id='Song_08_Part_6'>
+ <svg width="60" height="64" x='570' y='0' viewBox="0 0 60 64">
+   <rect style="fill:#f1c40f" width='58' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>I</text>
+   <text class='TXT_MES' x='60' y='2'>2</text>
+   
+   <text class='TXT_NOTE' x='0' y='63'></text>
+ </svg>
+</div><svg width="30" height="64" x='684' y='0' viewBox="0 0 30 64">
+  <rect style="fill:#000" width='4' height='48' x='4' y='1' rx='2' ry='1'/>
+  <rect style="fill:#000" width='10' height='48' x='10' y='1' rx='2' ry='1'/>
+  <text class='TXT_NOTE' x='0' y='63'></text>
+</svg><div>
+<svg width="16" height="64" x='798' y='0' viewBox="0 0 16 64">
+  
+
+  <text class='TXT_NOTE' x='0' y='63'></text>
+</svg>
+</div><div class='PartElement' id='Song_08_Part_9'>
+ <svg width="84" height="64" x='912' y='0' viewBox="0 0 84 64">
+   <rect style="fill:#34495e" width='82' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>B</text>
+   <text class='TXT_MES' x='84' y='2'>7</text>
+     <svg width='16' height='16' x='48' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>1</text>
+  </svg>
+  <svg width='16' height='16' x='64' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>2</text>
+  </svg>
+
+   <text class='TXT_NOTE' x='0' y='63'></text>
+ </svg>
+</div><div class='PartElement' id='Song_08_Part_10'>
+ <svg width="68" height="64" x='1026' y='0' viewBox="0 0 68 64">
+   <rect style="fill:#f1c40f" width='66' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>I</text>
+   <text class='TXT_MES' x='68' y='2'>4</text>
+     <svg width='16' height='16' x='48' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>1</text>
+  </svg>
+
+   <text class='TXT_NOTE' x='0' y='63'></text>
+ </svg>
+</div><div class='PartElement' id='Song_08_Part_11'>
+ <svg width="84" height="64" x='1140' y='0' viewBox="0 0 84 64">
+   <rect style="fill:#c0392b" width='82' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>S</text>
+   <text class='TXT_MES' x='84' y='2'>7</text>
+     <svg width='16' height='16' x='48' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>1</text>
+  </svg>
+  <svg width='16' height='16' x='64' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>2</text>
+  </svg>
+
+   <text class='TXT_NOTE' x='0' y='63'></text>
+ </svg>
+</div><div class='PartElement' id='Song_08_Part_12'>
+ <svg width="84" height="64" x='1254' y='0' viewBox="0 0 84 64">
+   <rect style="fill:#996633" width='82' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>O</text>
+   <text class='TXT_MES' x='84' y='2'>7</text>
+     <svg width='16' height='16' x='48' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>1</text>
+  </svg>
+  <svg width='16' height='16' x='64' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>2</text>
+  </svg>
+
+   <text class='TXT_NOTE' x='0' y='63'></text>
+ </svg>
+</div></div>
+
+   </div>
+  <div class="item itemFoot"></div>
+ </div>
+</div>
+<div id="IdPage_09" class="page">
+ <div class="ChildPage">
+  <div class="item itemHead">
+    <ins id="InsSongNamePage_09" >GET IT ON</ins>
+ <ins id="InsSongBpmPage_09" >&#9833; 144</ins>
+ <ins id="InsSongSartPage_09" ></ins>
+ <ins id="InsSongBpmVALPage_09" >144</ins>
+ <ins id="InsCounterArrayPage_09" >1;1;1;1;1;1;1;1;2;2;2;2;2;2;2;2;4;4;4;4;4;4;4;4;4;4;4;4;4;4;5;5;5;5;6;6;6;6;6;6;6;6;6;6;6;6;7;7;7;7;7;7;7;7;4;4;4;4;4;4;4;4;4;4;4;4;4;4;5;5;5;5;6;6;6;6;6;6;6;6;6;6;6;6;7;7;7;7;7;7;7;7;9;9;9;9;10;10;10;10;11;11;11;11;12;12;12;12;12;12;13;13;13;13;13;13;13;13;13;13;13;13;14;14;14;14;14;14;14;14;</ins>
+  </div>
+   <div class="item itemMain" id="DivSvgIdPage_09">
+     <div class="flex-container"><div class='PartElement' id='Song_09_Part_1'>
+ <svg width="84" height="64" x='0' y='0' viewBox="0 0 84 64">
+   <rect style="fill:#f1c40f" width='82' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>I</text>
+   <text class='TXT_MES' x='84' y='2'>8</text>
+     <svg width='16' height='16' x='48' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>1</text>
+  </svg>
+  <svg width='16' height='16' x='64' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>2</text>
+  </svg>
+
+   <text class='TXT_NOTE' x='0' y='63'></text>
+ </svg>
+</div><div class='PartElement' id='Song_09_Part_2'>
+ <svg width="84" height="64" x='114' y='0' viewBox="0 0 84 64">
+   <rect style="fill:#f1c40f" width='82' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>I</text>
+   <text class='TXT_MES' x='84' y='2'>8</text>
+     <svg width='16' height='16' x='48' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>1</text>
+  </svg>
+  <svg width='16' height='16' x='64' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>2</text>
+  </svg>
+
+   <text class='TXT_NOTE' x='0' y='63'></text>
+ </svg>
+</div><svg width="30" height="64" x='228' y='0' viewBox="0 0 30 64">
+  <rect style="fill:#000" width='10' height='48' x='10' y='1' rx='2' ry='1'/>
+  <rect style="fill:#000" width='4' height='48' x='24' y='1' rx='2' ry='1'/>
+  <text class='TXT_NOTE' x='0' y='63'></text>
+</svg><div class='PartElement' id='Song_09_Part_4'>
+ <svg width="116" height="64" x='342' y='0' viewBox="0 0 116 64">
+   <rect style="fill:#27ae60" width='114' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>V</text>
+   <text class='TXT_MES' x='116' y='2'>14</text>
+     <svg width='16' height='16' x='48' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>1</text>
+  </svg>
+  <svg width='16' height='16' x='64' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>2</text>
+  </svg>
+  <svg width='16' height='16' x='80' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>3</text>
+  </svg>
+  <svg width='16' height='16' x='96' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>4</text>
+  </svg>
+
+   <text class='TXT_NOTE' x='0' y='63'></text>
+ </svg>
+</div><div class='PartElement' id='Song_09_Part_5'>
+ <svg width="68" height="64" x='456' y='0' viewBox="0 0 68 64">
+   <rect style="fill:#f1c40f" width='66' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>I</text>
+   <text class='TXT_MES' x='68' y='2'>4</text>
+     <svg width='16' height='16' x='48' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>1</text>
+  </svg>
+
+   <text class='TXT_NOTE' x='0' y='63'></text>
+ </svg>
+</div><div class='PartElement' id='Song_09_Part_6'>
+ <svg width="100" height="64" x='570' y='0' viewBox="0 0 100 64">
+   <rect style="fill:#2980b9" width='98' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>C</text>
+   <text class='TXT_MES' x='100' y='2'>12</text>
+     <svg width='16' height='16' x='48' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>1</text>
+  </svg>
+  <svg width='16' height='16' x='64' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>2</text>
+  </svg>
+  <svg width='16' height='16' x='80' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>3</text>
+  </svg>
+
+   <text class='TXT_NOTE' x='0' y='63'></text>
+ </svg>
+</div><div class='PartElement' id='Song_09_Part_7'>
+ <svg width="84" height="64" x='684' y='0' viewBox="0 0 84 64">
+   <rect style="fill:#f1c40f" width='82' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>I</text>
+   <text class='TXT_MES' x='84' y='2'>8</text>
+     <svg width='16' height='16' x='48' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>1</text>
+  </svg>
+  <svg width='16' height='16' x='64' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>2</text>
+  </svg>
+
+   <text class='TXT_NOTE' x='0' y='63'></text>
+ </svg>
+</div><svg width="30" height="64" x='798' y='0' viewBox="0 0 30 64">
+  <rect style="fill:#000" width='4' height='48' x='4' y='1' rx='2' ry='1'/>
+  <rect style="fill:#000" width='10' height='48' x='10' y='1' rx='2' ry='1'/>
+  <text class='TXT_NOTE' x='0' y='63'></text>
+</svg><div class='PartElement' id='Song_09_Part_9'>
+ <svg width="68" height="64" x='912' y='0' viewBox="0 0 68 64">
+   <rect style="fill:#34495e" width='66' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>B</text>
+   <text class='TXT_MES' x='68' y='2'>4</text>
+   
+   <text class='TXT_NOTE' x='0' y='63'></text>
+ </svg>
+</div><div class='PartElement' id='Song_09_Part_10'>
+ <svg width="68" height="64" x='1026' y='0' viewBox="0 0 68 64">
+   <rect style="fill:#34495e" width='66' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>B</text>
+   <text class='TXT_MES' x='68' y='2'>4</text>
+   
+   <text class='TXT_NOTE' x='0' y='63'></text>
+ </svg>
+</div><div class='PartElement' id='Song_09_Part_11'>
+ <svg width="68" height="64" x='1140' y='0' viewBox="0 0 68 64">
+   <rect style="fill:#34495e" width='66' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>B</text>
+   <text class='TXT_MES' x='68' y='2'>4</text>
+   
+   <text class='TXT_NOTE' x='0' y='63'></text>
+ </svg>
+</div><div class='PartElement' id='Song_09_Part_12'>
+ <svg width="76" height="64" x='1254' y='0' viewBox="0 0 76 64">
+   <rect style="fill:#34495e" width='74' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>B</text>
+   <text class='TXT_MES' x='76' y='2'>6</text>
+     <svg width='16' height='16' x='56' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>1</text>
+  </svg>
+
+   <text class='TXT_NOTE' x='0' y='63'></text>
+ </svg>
+</div><div class='PartElement' id='Song_09_Part_13'>
+ <svg width="100" height="64" x='1368' y='0' viewBox="0 0 100 64">
+   <rect style="fill:#2980b9" width='98' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>C</text>
+   <text class='TXT_MES' x='100' y='2'>12</text>
+     <svg width='16' height='16' x='48' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>1</text>
+  </svg>
+  <svg width='16' height='16' x='64' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>2</text>
+  </svg>
+  <svg width='16' height='16' x='80' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>3</text>
+  </svg>
+
+   <text class='TXT_NOTE' x='0' y='63'></text>
+ </svg>
+</div><div class='PartElement' id='Song_09_Part_14'>
+ <svg width="84" height="64" x='1482' y='0' viewBox="0 0 84 64">
+   <rect style="fill:#27ae60" width='82' height='48' x='1' y='1' rx='10' ry='10'/>
+   <text class='TXT_TYPE' x='0' y='0'>V</text>
+   <text class='TXT_MES' x='84' y='2'>8</text>
+     <svg width='16' height='16' x='48' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>1</text>
+  </svg>
+  <svg width='16' height='16' x='64' y='30' viewBox="0 0 50 50">
+   <rect class='BOX_PART WARN_000' width='50' height='50' x='0' y='0' rx='10' ry='10'/>
+   <text class='TXT_PART' x='25' y='25'>2</text>
+  </svg>
+
+   <text class='TXT_NOTE' x='0' y='63'></text>
+ </svg>
+</div></div>
+
+   </div>
+  <div class="item itemFoot"></div>
+ </div>
+</div>
+
+        </main>
+        <footer>
+             <nav>
+    <button class="btnPager" href="#" onclick="showPage('00')">00</button>
+<button class="btnPager" href="#" onclick="showPage('01')">01</button>
+<button class="btnPager" href="#" onclick="showPage('02')">02</button>
+<button class="btnPager" href="#" onclick="showPage('03')">03</button>
+<button class="btnPager" href="#" onclick="showPage('04')">04</button>
+<button class="btnPager" href="#" onclick="showPage('05')">05</button>
+<button class="btnPager" href="#" onclick="showPage('06')">06</button>
+<button class="btnPager" href="#" onclick="showPage('07')">07</button>
+<button class="btnPager" href="#" onclick="showPage('08')">08</button>
+<button class="btnPager" href="#" onclick="showPage('09')">09</button>
+
+            </nav>
+        </footer>
+    </div>
+</body>
+</html>
