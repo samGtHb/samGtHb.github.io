@@ -40,7 +40,7 @@ function AdjustSize() {
   var WidthSize = parseFloat(document.getElementById('InsWidthPartPage_' + strPageID ).innerHTML) +
    4 * parseFloat(document.getElementById('InsNBPartPage_' + strPageID ).innerHTML) + 30 ;  
   var zoomCoeff = document.getElementById('IdPage_' + strPageID ).clientWidth / WidthSize;
-  var zoomHeightZoom = 1.2;
+  var zoomHeightZoom = 1;
   if ( (180 * zoomCoeff * 1.6) < document.getElementById('IdPage_' + strPageID ).clientHeight )	
 	zoomHeightZoom = 1.5;
   document.getElementById('DivSvgIdPage_' + strPageID ).style.zoom =  zoomCoeff * zoomHeightZoom;
